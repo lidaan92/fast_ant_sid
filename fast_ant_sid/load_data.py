@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import dimarray as da
 from scipy import interpolate
-
+import natsort
 
 def running_mean(x, N):
     """ running mean with masked out boundaries, signal in beginning of array """
@@ -51,7 +51,7 @@ def read_dp16_data(fname):
 
 def get_dp16_mean_esl(rcp_path):
 
-    ensemle_files = sorted(glob.glob(rcp_path+"/*"))
+    ensemle_files = natsort.natsorted(glob.glob(rcp_path+"/*"))
 
     df_first = read_dp16_data(ensemle_files[0])
 
