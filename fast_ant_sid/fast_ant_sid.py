@@ -6,8 +6,8 @@ def square(arg):
     return np.sign(arg)*np.square(arg)
 
 
-def calc_solid_ice_discharge(forcing_temperature, parameters, voltotal,
-                                  temp_sensitivity=square):
+def calc_solid_ice_discharge(forcing_temperature, parameters,
+    initial_icesheet_vol, temp_sensitivity=square):
 
     """ Solid ice discharge as used in Nauels et al. 2017, ERL, submitted.
     """
@@ -15,25 +15,29 @@ def calc_solid_ice_discharge(forcing_temperature, parameters, voltotal,
     sid_sens, fast_rate, temp0, temp_thresh = parameters
 
     def slow_discharge(volume, temperature, temp0, sid_sens):
-        # positive rates lead to sea level rise
-        return -1.*sid_sens*volume*temp_sensitivity(temperature-temp0)
+        # negative rates mean ice volume loss
+        return sid_sens*volume*temp_sensitivity(temperature-temp0)
 
     ## time spans forcing period
     time = np.arange(0,len(forcing_temperature),1)
 
     icesheet_vol = np.zeros_like(forcing_temperature)
-    icesheet_vol[0] = voltotal
+    icesheet_vol[0] = initial_icesheet_vol
     slr_from_sid = np.zeros_like(forcing_temperature)
 
-    # positive rates lead to sea level rise
-    fast_sid = -1* fast_rate*np.array(forcing_temperature > temp_thresh,
+    # negative rates lead to sea level rise
+    fast_sid = fast_rate*np.array(forcing_temperature > temp_thresh,
                                       dtype = np.float)
 
     for t in time[0:-1]:
         sid_slow = slow_discharge(icesheet_vol[t], forcing_temperature[t],
                                    temp0, sid_sens)
-        icesheet_vol[t+1] =  sid_slow + fast_sid[t] + icesheet_vol[t]
-        slr_from_sid[t+1] = voltotal - icesheet_vol[t+1]
+
+        # yearly discharge rate cannot be larger than remaining volume
+        discharge = np.minimum(icesheet_vol[t], sid_slow+fast_sid[t])
+        # positive sid rates mean ice volume loss
+        icesheet_vol[t+1] = icesheet_vol[t] - discharge
+        slr_from_sid[t+1] = initial_icesheet_vol - icesheet_vol[t+1]
 
     return slr_from_sid
 
