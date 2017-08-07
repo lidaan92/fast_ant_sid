@@ -48,8 +48,9 @@ def calc_solid_ice_discharge(forcing_temperature, parameters, final_volume,
         temp_sensitivity=temp_sensitivity)
 
 #     fast_sid = np.zeros_like(forcing_temperature)
-    fast_sid = fastrate*(forcing_temperature-temp_thresh)
-
+    fast_sid = fastrate*np.array(forcing_temperature > temp_thresh,
+                                    dtype = np.float)
+#     print fast_sid
     return slow_sid + scipy.integrate.cumtrapz(fast_sid, initial=0)
 
 

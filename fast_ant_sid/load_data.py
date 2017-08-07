@@ -17,7 +17,7 @@ def running_mean(x, N):
 
 def load_ccsm4_data(scen="rcp26", relative_to=[1950,1980]):
 
-    ccsm_file = "data/ccsm4_forcing/ccsm4_gmt_"+scen+".txt"
+    ccsm_file = "../data/ccsm4_forcing/ccsm4_gmt_"+scen+".txt"
     ccsm_gmt_data = np.loadtxt(ccsm_file)
     end_of_first_ens_member = np.where(ccsm_gmt_data[:,0] == 2300)[0][0]
     time = ccsm_gmt_data[0:end_of_first_ens_member+1,0]
@@ -27,11 +27,11 @@ def load_ccsm4_data(scen="rcp26", relative_to=[1950,1980]):
     gmt = da.DimArray(f(yearly_time),axes=yearly_time,dims="time")
     gmt = gmt - gmt[relative_to[0]:relative_to[1]].mean()
 
-    ## specific for DP16: prolong timeseries after 2175 with constant value
+    ## specific for DP16: prolong timeseries after 2300 with constant value
     ## of that year
-    gmt_const = da.DimArray(np.repeat(gmt[2175],325),dims="time",
-                  axes=np.arange(2176,2501))
-    gmt = da.concatenate([gmt[1850:2175],gmt_const])
+    gmt_const = da.DimArray(np.repeat(gmt[2300], 200),dims="time",
+                  axes=np.arange(2301,2501))
+    gmt = da.concatenate([gmt,gmt_const])
 
     return gmt
 
@@ -65,3 +65,43 @@ def get_dp16_mean_esl(rcp_path):
         df_mean_esl[em_name] = df["esl(m)"]
 
     return df_mean_esl
+
+
+
+def read_magicc_output(fname):
+    """
+    This is a copy from the pymagicc package. Credits to Robert Giesecke.
+    Input: Any MAGICC .OUT file
+    Output: Pandas DataFrame
+    """
+
+    units = []
+    with open(fname, 'r') as f:
+        for idx,line in enumerate(f):
+            if "YEARS" in line[0:10]:
+                startidx = idx
+            if "UNITS" in line[0:10]:
+                unitidx = idx
+                # keep out UNITS itself from the list
+                units = line.split()[1:]
+                # print units
+
+    output = pd.read_csv(
+        fname,
+        engine='python',
+        quotechar='"',
+        sep='\s*',
+        # quoting=csv.QUOTE_ALL,
+        skipinitialspace=True,
+        skiprows=startidx,
+        index_col=0
+    )
+
+    # try to convert different units to one and the same
+    if len(set(units)) > 1:
+        units_to_numbers = {"Gt":1.e9,"Mt":1.e6,"kt":1.e3}
+        conversion = [units_to_numbers[item[0:2]] for item in units]
+        output = output * conversion
+
+    return output
+
