@@ -43,27 +43,6 @@ def calc_solid_ice_discharge(forcing_temperature, parameters,
 
 
 
-# def calc_solid_ice_discharge(forcing_temperature, parameters, final_volume,
-#                               temp_sensitivity=square):
-
-#     """ as used in Nauels et al. ERL 2017 (in revision) """
-
-#     sid_sens, fastrate, temp0, temp_thresh = parameters
-#     # keep sid_expsens fixed at 1 here: it is incorporated in sid_sens
-#     sid_expsens = 1.
-#     voltotal = final_volume
-
-#     slow_sid = calc_slow_solid_ice_discharge(
-#         forcing_temperature, voltotal, sid_sens, sid_expsens,
-#         temp_sensitivity=temp_sensitivity)
-
-# #     fast_sid = np.zeros_like(forcing_temperature)
-#     fast_sid = fastrate*np.array(forcing_temperature > temp_thresh,
-#                                     dtype = np.float)
-# #     print fast_sid
-#     return slow_sid + scipy.integrate.cumtrapz(fast_sid, initial=0)
-
-
 def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
 
     """ handles several scenarios for one parameter set.
@@ -73,20 +52,23 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
     least_sq_error = np.zeros(len(reference_data.keys()))
 
     for i,scen in enumerate(reference_data.keys()):
-        forc = forcing[scen]
         refdata = reference_data[scen]
+        forc = forcing[scen]
+
+        overlapping_indices = np.searchsorted(forc.index,refdata.index)
 
         # least square error between slr and
         # we here assume all ice can be lost until last year of simulation
         # final_volume = refdata[2500]
-        slr = calc_solid_ice_discharge(forc, parameters, max_volume_to_lose,
+        slr = calc_solid_ice_discharge(forc.values, parameters, max_volume_to_lose,
                                     temp_sensitivity=square)
 
+        # only use the years for optimization that overlap with reference data
+        slr = slr[overlapping_indices]
         # for normalizing the scenarios, i.e. making them more equally
         # important in the optimization
-        max_slr_in_ref = refdata.max()
-
-        least_sq_error[i] = ((slr - refdata)**2.).sum()/max_slr_in_ref
+        max_slr_range_in_ref = refdata.max() - refdata.min()
+        least_sq_error[i] = ((slr - refdata)**2.).sum()/max_slr_range_in_ref
 
     return least_sq_error.sum()
 
