@@ -71,6 +71,7 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
         (not dependent on parameter set.) """
 
     least_sq_error = np.zeros(len(reference_data.keys()))
+
     for i,scen in enumerate(reference_data.keys()):
         forc = forcing[scen]
         refdata = reference_data[scen]
@@ -81,7 +82,11 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
         slr = calc_solid_ice_discharge(forc, parameters, max_volume_to_lose,
                                     temp_sensitivity=square)
 
-        least_sq_error[i] = ((slr - refdata)**2.).sum()
+        # for normalizing the scenarios, i.e. making them more equally
+        # important in the optimization
+        max_slr_in_ref = refdata.max()
+
+        least_sq_error[i] = ((slr - refdata)**2.).sum()/max_slr_in_ref
 
     return least_sq_error.sum()
 
