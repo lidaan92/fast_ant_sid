@@ -43,7 +43,7 @@ def calc_solid_ice_discharge(forcing_temperature, parameters,
 
 
 
-def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
+def least_square_error(parameters, forcing, reference_data, max_volume_to_lose, anomaly_year=1950):
 
     """ handles several scenarios for one parameter set.
         We assume that there is one global maximum ice volume that can be lost
@@ -65,6 +65,9 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose):
 
         # only use the years for optimization that overlap with reference data
         slr = slr[overlapping_indices]
+        # relative to the year of DP16 reference start
+        ref_index = np.where(refdata.index == anomaly_year)[0][0]
+        slr = slr - slr[ref_index]
         # for normalizing the scenarios, i.e. making them more equally
         # important in the optimization
         max_slr_range_in_ref = refdata.max() - refdata.min()
@@ -101,3 +104,43 @@ def calc_solid_ice_discharge_nauels_gmd(forcing_temperature,voltotal,a,b,
         slr[t+1] = voltotal - icesheet_vol[t+1]
 
     return slr, solid_ice_discharge
+
+
+def optimization():
+
+    """ here only for reference, check the jupyter notebook for the
+    functioning version. """
+
+    sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
+    bounds = ((0.,1.e-4),(0.,100.),(-2.,10.),(0.,10.))
+
+    # determine maximum volume one time, (taken most sensitive run in year 2500)
+    max_volume_to_lose = dp16_slr_mean["RCP85PIT"].max().max()
+
+    parameters = (sid_sens, fastrate, temp0, temp_thresh)
+
+    forcing = {scen:magicc_gmt[scen] for scen in magicc_gmt}
+
+    parameters_ens = pd.DataFrame(columns=["sid_sens","fastrate","temp0","temp_thresh"])
+
+    for i,member in enumerate(dp16_slr_mean["RCP26PIT"].keys()[:]):
+        print member,
+        try:
+            reference_data = {"RCP26":dp16_slr_mean["RCP26PIT"][member],
+                              "RCP45":dp16_slr_mean["RCP45PIT"][member],
+                              "RCP85":dp16_slr_mean["RCP85PIT"][member]}
+        except KeyError:
+            reference_data = {"RCP26":dp16_slr_mean["RCP26PIT"][member],
+                              "RCP85":dp16_slr_mean["RCP85PIT"][member]}
+
+        parameters = mystic.scipy_optimize.fmin(fas.least_square_error, parameters,
+                          args=(forcing,reference_data, max_volume_to_lose),
+                          bounds=bounds, ftol = 1.e-5, maxiter = 10000, disp=0)
+
+    #     OptimizeResult = optimize.minimize(fas.least_square_error, parameters,
+    #                       args=(forcing,reference_data, max_volume_to_lose),
+    #                       method="Nelder-Mead",
+    #                       bounds=bounds, options={"maxiter":10000,"disp":True,"ftol":1.e-6})
+
+    #     parameters = OptimizeResult.x
+        parameters_ens.loc[member,:] = parameters
