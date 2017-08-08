@@ -15,7 +15,11 @@ custom_max_vol = False
 sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
 bounds = ((0.,1.e-3),(0.,100.),(0.,10.),(0.,10.))
 
-# data
+# Deconto & Pollard 2016 RCP projection data and global mean
+# temperature evolution from MAGICC for CCSM4
+# make sure you have these. They do not come with the repository
+# as they are not publicly available.
+
 dp16_path = "data/deconto_pollard16/"
 
 dp16_slr_mean = collections.OrderedDict()
@@ -68,4 +72,8 @@ def calibrate_ant_sid(max_volume_to_lose):
 if __name__ == "__main__":
 
     parameter_ens = calibrate_ant_sid(max_volume_to_lose)
+
+    if not os.path.exists("data/parameters/"):
+        os.makedirs("data/parameters/")
+
     parameter_ens.to_csv("data/parameters/parameter_ens.csv")

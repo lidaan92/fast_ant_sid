@@ -14,6 +14,17 @@ for sample plots and test of different temperature sensitivies.
 
 `python run_calibration.py`
 
+Reading in the parmeters sets from `data/parameters/` folder:
+``` python
+import pandas
+pandas.read_csv("data/parameters/parameters_ens.csv",index_col=0)
+```
+
+### Dependencies
+
+numpy, pandas, mystic, natsort
+
+
 ### Authors
 
 Matthias Mengel, Potsdam Institute for Climate Impact Research, Germany

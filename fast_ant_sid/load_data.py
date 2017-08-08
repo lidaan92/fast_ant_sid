@@ -2,38 +2,7 @@
 import glob
 import numpy as np
 import pandas as pd
-import dimarray as da
-from scipy import interpolate
 import natsort
-
-def running_mean(x, N):
-    """ running mean with masked out boundaries, signal in beginning of array """
-    # rmean = np.ma.array(x,copy=True,mask=True)
-    rmean  = np.copy(x.values)
-    rmean[:-N+1] = np.convolve(x, np.ones((N,))/N,"valid")
-    rmean[-N+1:] = rmean[-N]
-    return da.DimArray(rmean,axes=x.time,dims="time")
-
-
-def load_ccsm4_data(scen="rcp26", relative_to=[1950,1980]):
-
-    ccsm_file = "../data/ccsm4_forcing/ccsm4_gmt_"+scen+".txt"
-    ccsm_gmt_data = np.loadtxt(ccsm_file)
-    end_of_first_ens_member = np.where(ccsm_gmt_data[:,0] == 2300)[0][0]
-    time = ccsm_gmt_data[0:end_of_first_ens_member+1,0]
-    gmt = ccsm_gmt_data[0:end_of_first_ens_member+1,1]
-    f = interpolate.interp1d(time, gmt)
-    yearly_time = np.arange(time[0],time[-1]+1,1)
-    gmt = da.DimArray(f(yearly_time),axes=yearly_time,dims="time")
-    gmt = gmt - gmt[relative_to[0]:relative_to[1]].mean()
-
-    ## specific for DP16: prolong timeseries after 2300 with constant value
-    ## of that year
-    gmt_const = da.DimArray(np.repeat(gmt[2300], 200),dims="time",
-                  axes=np.arange(2301,2501))
-    gmt = da.concatenate([gmt,gmt_const])
-
-    return gmt
 
 
 def read_dp16_data(fname):
