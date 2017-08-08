@@ -1,4 +1,4 @@
-## Tuning of the Fast Ice discharge Parametrization
+## Ice discharge parametrization for Antarctica
 
 Find the code for the ice discharge parametrization as submitted
 (Nauels et al. 2017) and its calibration here.
@@ -20,6 +20,9 @@ Matthias Mengel, Potsdam Institute for Climate Impact Research, Germany
 
 Alexander Nauels, Australian-German Climate and Energy College, Australia
 
+### Cite as
+
+not yet.
 
 ### License
 
