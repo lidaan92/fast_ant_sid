@@ -6,6 +6,10 @@ def square(arg):
     return np.sign(arg)*np.square(arg)
 
 
+def linear(arg):
+    return arg
+
+
 def calc_solid_ice_discharge(forcing_temperature, parameters,
     initial_icesheet_vol, temp_sensitivity=square):
 
@@ -43,7 +47,8 @@ def calc_solid_ice_discharge(forcing_temperature, parameters,
 
 
 
-def least_square_error(parameters, forcing, reference_data, max_volume_to_lose, anomaly_year=1950):
+def least_square_error(parameters, forcing, reference_data, max_volume_to_lose,
+                       temp_sensitivity=square, anomaly_year=1950):
 
     """ handles several scenarios for one parameter set.
         We assume that there is one global maximum ice volume that can be lost
@@ -59,9 +64,8 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose, 
 
         # least square error between slr and
         # we here assume all ice can be lost until last year of simulation
-        # final_volume = refdata[2500]
         slr = calc_solid_ice_discharge(forc.values, parameters, max_volume_to_lose,
-                                    temp_sensitivity=square)
+                                    temp_sensitivity=temp_sensitivity)
 
         # only use the years for optimization that overlap with reference data
         slr = slr[overlapping_indices]
