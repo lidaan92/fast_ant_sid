@@ -10,7 +10,7 @@ import fast_ant_sid.load_data as ld; reload(ld)
 # options
 # decide wether to take a global maximum ice volume
 # to lose accross DP16 ensemble members, or have it per member.
-custom_max_vol = True
+custom_max_vol = False
 
 sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
 bounds = ((0.,1.e-3),(0.,100.),(0.,10.),(0.,10.))
@@ -33,7 +33,7 @@ for scen in ["RCP26","RCP45","RCP85"]:
 max_volume_to_lose = dp16_slr_mean["RCP85PIT"].max().max()
 
 
-def calibrate_ant_sid():
+def calibrate_ant_sid(max_volume_to_lose):
 
     parameters = (sid_sens, fastrate, temp0, temp_thresh)
 
@@ -67,5 +67,5 @@ def calibrate_ant_sid():
 
 if __name__ == "__main__":
 
-    parameter_ens = calibrate_ant_sid()
+    parameter_ens = calibrate_ant_sid(max_volume_to_lose)
     parameter_ens.to_csv("data/parameters/parameter_ens.csv")
