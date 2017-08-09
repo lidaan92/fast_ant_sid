@@ -12,7 +12,9 @@ import fast_ant_sid.load_data as ld; reload(ld)
 # to lose accross DP16 ensemble members, or have it per member.
 custom_max_vol = False
 
-sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
+temperature_sensitivity = fas.square
+
+sid_sens, fastrate, temp0, temp_thresh = 5.e-5, 10., 2., 2.5
 bounds = ((0.,1.e-3),(0.,100.),(0.,10.),(0.,10.))
 
 # Deconto & Pollard 2016 RCP projection data and global mean
@@ -61,7 +63,8 @@ def calibrate_ant_sid(max_volume_to_lose):
             max_volume_to_lose = dp16_slr_mean["RCP85PIT"][member].max()
 
         parameters = mystic.scipy_optimize.fmin(fas.least_square_error, parameters,
-                          args=(forcing,reference_data, max_volume_to_lose),
+                          args=(forcing, reference_data, max_volume_to_lose,
+                                temperature_sensitivity),
                           bounds=bounds, xtol = 1e-10, ftol = 1.e-10, maxiter = 10000, disp=0)
 
         parameters_ens.loc[member,:] = parameters
