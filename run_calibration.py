@@ -14,7 +14,7 @@ custom_max_vol = False
 
 temperature_sensitivity = fas.square
 
-sid_sens, fastrate, temp0, temp_thresh = 5.e-5, 10., 2., 2.5
+sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
 bounds = ((0.,1.e-3),(0.,100.),(0.,10.),(0.,10.))
 
 # Deconto & Pollard 2016 RCP projection data and global mean
@@ -46,6 +46,7 @@ def calibrate_ant_sid(max_volume_to_lose):
     forcing = {scen:magicc_gmt[scen] for scen in magicc_gmt}
 
     parameters_ens = pd.DataFrame(columns=["sid_sens","fastrate","temp0","temp_thresh"])
+    remaining_errors = pd.DataFrame(columns=["remaining error"])
 
     for i,member in enumerate(dp16_slr_mean["RCP26PIT"].keys()[:]):
 
@@ -62,21 +63,25 @@ def calibrate_ant_sid(max_volume_to_lose):
         if custom_max_vol:
             max_volume_to_lose = dp16_slr_mean["RCP85PIT"][member].max()
 
-        parameters = mystic.scipy_optimize.fmin(fas.least_square_error, parameters,
+        solution = mystic.scipy_optimize.fmin(fas.least_square_error, parameters,
                           args=(forcing, reference_data, max_volume_to_lose,
                                 temperature_sensitivity),
-                          bounds=bounds, xtol = 1e-10, ftol = 1.e-10, maxiter = 10000, disp=0)
+                          bounds=bounds, xtol = 1e-10, ftol = 1.e-10, maxiter = 10000,
+                          full_output=1, disp=0)
 
+        parameters = solution[0]
         parameters_ens.loc[member,:] = parameters
+        remaining_errors.loc[member] = solution[1]
 
-    return parameters_ens
+    return parameters_ens, remaining_errors
 
 
 if __name__ == "__main__":
 
-    parameter_ens = calibrate_ant_sid(max_volume_to_lose)
+    parameter_ens, remaining_errors = calibrate_ant_sid(max_volume_to_lose)
 
     if not os.path.exists("data/parameters/"):
         os.makedirs("data/parameters/")
 
     parameter_ens.to_csv("data/parameters/parameter_ens.csv")
+    remaining_errors.to_csv("data/parameters/remaining_errors.csv")
