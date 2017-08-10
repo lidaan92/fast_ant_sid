@@ -6,7 +6,7 @@ Find the code for the ice discharge parametrization as submitted
 Please contact the authors if you would like to rerun the calibration,
 as we cannot the reference data from Deconto & Pollard (Nature 2016) within this repository.
 
-Please also have a look at `examples/` notebooks for illustrative plots and
+Please also have a look at [example notebooks](examples) for illustrative plots and
 sensitivity tests.
 
 ### Usage
@@ -30,6 +30,11 @@ in [this notebook](examples/fast_sid_param_sensitvity.ipynb).
 
 numpy, pandas, mystic, natsort
 
+### Fortran sea level code
+
+We provide the Fortran code that is part of the revised MAGICC sea level module
+[here](fortran/MAGICC_SLR_AIS_SID_component.f90). Please not that this is for reference and cannot be executed without MAGICC itself. MAGICC is not open source
+and can therefore not be provided here.
 
 ### Authors
 
