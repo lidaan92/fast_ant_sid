@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 def square(arg):
@@ -78,6 +79,28 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose,
         least_sq_error[i] = ((slr - refdata)**2.).sum()/max_slr_range_in_ref
 
     return least_sq_error.sum()
+
+
+def get_quantiles(slr_fitted, relative_to=2000):
+
+    projection_quantiles = {}
+    for scen in slr_fitted.keys():
+
+        projections = pd.DataFrame(index=slr_fitted[scen]["1.22"].index,
+                               columns=slr_fitted[scen].keys())
+
+        for key, data in slr_fitted[scen].iteritems():
+            projections.loc[:,key] = data.values
+
+        projections -= projections.loc[relative_to,:]
+
+        projection_quantiles[scen] = pd.DataFrame(
+            index=projections.index,columns=[0.05,0.1667,0.5,0.8333,0.95])
+
+        for quantile in projection_quantiles[scen].keys():
+            projection_quantiles[scen].loc[:,quantile] = projections.quantile(quantile,axis=1)
+
+    return projection_quantiles
 
 
 def calc_solid_ice_discharge_nauels_gmd(forcing_temperature,voltotal,a,b,
