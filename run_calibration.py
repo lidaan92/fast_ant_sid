@@ -7,20 +7,21 @@ import fast_ant_sid.fast_ant_sid as fas; reload(fas)
 import fast_ant_sid.load_data as ld; reload(ld)
 
 
-# options
-# decide wether to take a global maximum ice volume
-# to lose accross DP16 ensemble members, or have it per member.
+# options:
+
+# Decide wether to take one global maximum ice loss volume or
+# member specific global maximum ice loss volumes to constrain the parameterization.
 custom_max_vol = False
 
+# choose functional form of parameterization (linear or square)
 temperature_sensitivity = fas.square
 
+# define start values and bounds for the calibration parameters
 sid_sens, fastrate, temp0, temp_thresh = 1.e-5, 20, 4., 4.
 bounds = ((0.,1.e-3),(0.,100.),(0.,10.),(0.,10.))
 
-# Deconto & Pollard 2016 RCP projection data and global mean
-# temperature evolution from MAGICC for CCSM4
-# make sure you have these. They do not come with the repository
-# as they are not publicly available.
+# Deconto & Pollard (2016, Nature) reference data
+# this data does not come with the repository as it is not publicly available.
 
 dp16_path = "data/deconto_pollard16/"
 
@@ -29,6 +30,7 @@ for case in ["RCP26","RCP26PIT","RCP45","RCP45PIT","RCP85","RCP85PIT"]:
     # in mm
     dp16_slr_mean[case] = ld.get_dp16_mean_esl(os.path.join(dp16_path,case))*1.e3
 
+# GMT evolution from MAGICC for CCSM4 until year 2500.
 magicc_data_path = "data/magicc_gmts"
 magicc_gmt = collections.OrderedDict()
 for scen in ["RCP26","RCP45","RCP85"]:
@@ -38,7 +40,7 @@ for scen in ["RCP26","RCP45","RCP85"]:
 # determine maximum volume across all runs
 max_volume_to_lose = dp16_slr_mean["RCP85PIT"].max().max()
 
-
+# run calibration
 def calibrate_ant_sid(max_volume_to_lose):
 
     parameters = (sid_sens, fastrate, temp0, temp_thresh)

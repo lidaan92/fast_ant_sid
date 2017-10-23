@@ -1,10 +1,10 @@
 ## Ice discharge parametrization for Antarctica
 
-Find the code for the ice discharge parametrization as submitted
-(Nauels et al. 2017) and its calibration here.
+This is the code for the Nauels et al. (2017, ERL) ice discharge parametrization
+and the underlying calibration.
 
 Please contact the authors if you would like to rerun the calibration,
-as we cannot the reference data from Deconto & Pollard (Nature 2016) within this repository.
+as we cannot provide the reference data from Deconto & Pollard (2016, Nature) within this repository.
 
 Please also have a look at [example notebooks](examples) for illustrative plots and
 sensitivity tests.
@@ -13,11 +13,10 @@ sensitivity tests.
 
 `python run_calibration.py`
 
-
 ### Examples
 
-The quadratic temperature sensitivity as
-it is used in the manuscript is [here](examples/fast_sid_quadratic.ipynb).
+The quadratic temperature sensitivity, as
+it is used in the manuscript, is [here](examples/fast_sid_quadratic.ipynb).
 
 For comparison, the linear sensitivity to global mean temperature deviations
 is discussed [here](examples/fast_sid_linear.ipynb).
@@ -33,7 +32,7 @@ numpy, pandas, mystic, natsort
 ### Fortran sea level code
 
 We provide the Fortran code that is part of the revised MAGICC sea level module
-[here](fortran/MAGICC_SLR_AIS_SID_component.f90). Please not that this is for reference and cannot be executed without MAGICC itself. MAGICC is not open source
+[here](fortran/MAGICC_SLR_AIS_SID_component.f90). Please note that this code is for reference and cannot be executed without MAGICC itself. MAGICC is not open source
 and can therefore not be provided here.
 
 ### Authors
@@ -44,7 +43,8 @@ Alexander Nauels, Australian-German Climate and Energy College, Australia
 
 ### Cite as
 
-not yet.
+Nauels, A., Rogelj, J., Schleussner, C.-F., Meinshausen, M. and Mengel, M. (2017): Linking sea level rise and socioeconomic indicators under the Shared Socioeconomic Pathways,
+Environmental Reserch Letters, http://iopscience.iop.org/10.1088/1748-9326/aa92b6
 
 ### Platforms
 

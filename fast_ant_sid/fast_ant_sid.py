@@ -14,7 +14,7 @@ def linear(arg):
 def calc_solid_ice_discharge(forcing_temperature, parameters,
     initial_icesheet_vol, temp_sensitivity=square):
 
-    """ Solid ice discharge as used in Nauels et al. 2017, ERL, submitted.
+    """ solid ice discharge as used in Nauels et al. (2017, ERL).
     """
 
     sid_sens, fast_rate, temp0, temp_thresh = parameters
@@ -40,6 +40,7 @@ def calc_solid_ice_discharge(forcing_temperature, parameters,
 
         # yearly discharge rate cannot be larger than remaining volume
         discharge = np.minimum(icesheet_vol[t], sid_slow+fast_sid[t])
+
         # positive sid rates mean ice volume loss
         icesheet_vol[t+1] = icesheet_vol[t] - discharge
         slr_from_sid[t+1] = initial_icesheet_vol - icesheet_vol[t+1]
@@ -70,9 +71,11 @@ def least_square_error(parameters, forcing, reference_data, max_volume_to_lose,
 
         # only use the years for optimization that overlap with reference data
         slr = slr[overlapping_indices]
+
         # relative to the year of DP16 reference start
         ref_index = np.where(refdata.index == anomaly_year)[0][0]
         slr = slr - slr[ref_index]
+
         # for normalizing the scenarios, i.e. making them more equally
         # important in the optimization
         max_slr_range_in_ref = refdata.max() - refdata.min()
@@ -106,7 +109,7 @@ def get_quantiles(slr_fitted, relative_to=2000):
 def calc_solid_ice_discharge_nauels_gmd(forcing_temperature,voltotal,a,b,
                             temp_sensitivity=np.exp):
 
-    """ OLD: here for reference
+    """ OLD for reference:
     solid ice discharge as used in Nauels et al. 2017 for the
     Greenland solid ice discharge. Ice loss is exponentially dependent
     on the driving temperature in Nauels et al. 2017. """
