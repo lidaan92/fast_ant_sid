@@ -44,7 +44,7 @@ Alexander Nauels, Australian-German Climate and Energy College, Australia
 ### Cite as
 
 Nauels, A., Rogelj, J., Schleussner, C.-F., Meinshausen, M. and Mengel, M. (2017): Linking sea level rise and socioeconomic indicators under the Shared Socioeconomic Pathways,
-Environmental Reserch Letters, http://iopscience.iop.org/10.1088/1748-9326/aa92b6
+Environmental Reserch Letters, http://iopscience.iop.org/article/10.1088/1748-9326/aa92b6
 
 ### Platforms
 
